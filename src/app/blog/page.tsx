@@ -1,5 +1,6 @@
 import { blogSource } from '@/lib/source';
 import type { Metadata } from 'next';
+import type { InferPageType } from 'fumadocs-core/source';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
@@ -7,8 +8,10 @@ export const metadata: Metadata = {
   description: 'Latest updates and news from Casbin',
 };
 
+type BlogPage = InferPageType<typeof blogSource>;
+
 export default function Page() {
-  const pages = blogSource.getPages();
+  const pages: BlogPage[] = blogSource.getPages();
 
   return (
     <>
@@ -28,25 +31,27 @@ export default function Page() {
 
       <section className="w-full px-6 mt-12 mb-12">
         <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 gap-2 md:grid-cols-3 xl:grid-cols-4">
           {pages.map((page) => (
-            <article key={page.slugs.join('/')} className="bg-white/80 backdrop-blur-sm border rounded-lg p-4 shadow-sm">
-              <h2 className="text-lg font-semibold">
-                <Link href={`/blog/${page.slugs.join('/')}`} className="hover:underline">
-                  {page.data.title}
-                </Link>
-              </h2>
+            <Link
+              key={page.slugs.join('/')}
+              href={`/blog/${page.slugs.join('/')}`}
+              className="flex flex-col bg-white/80 backdrop-blur-sm rounded-2xl border shadow-sm p-4 transition-colors hover:bg-accent hover:text-accent-foreground hover:shadow-lg"
+              aria-label={`Read ${page.data.title}${page.data.date ? ` - Published ${new Date(page.data.date).toLocaleDateString()}` : ''}`}
+            >
+              <p className="font-medium">{page.data.title}</p>
               {page.data.description && (
-                <p className="text-muted-foreground mt-2">
+                <p className="mt-1 text-sm text-muted-foreground">
                   {page.data.description}
                 </p>
               )}
+
               {page.data.date && (
-                <p className="text-sm text-muted-foreground mt-2">
+                <time dateTime={new Date(page.data.date).toISOString()} className="mt-auto pt-4 text-xs text-[color:var(--brand-primary)]">
                   {new Date(page.data.date).toLocaleDateString()}
-                </p>
+                </time>
               )}
-            </article>
+            </Link>
           ))}
         </div>
         </div>
