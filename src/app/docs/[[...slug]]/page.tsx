@@ -16,6 +16,7 @@ import Link from 'next/link';
 import { Feedback } from '@/components/feedback/client';
 import { onPageFeedbackAction } from '@/lib/github';
 import { LastUpdated } from '@/components/last-updated';
+import Comments from '@/components/Comments';
 import { AuthorCard } from '@/components/blog/AuthorCard';
 import { calculateReadingTime } from '@/lib/utils';
 
@@ -60,7 +61,14 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
   const readTime = calculateReadingTime(rawContent);
 
   return (
-    <DocsPage toc={data.toc} full={data.full}>
+    <DocsPage
+      toc={data.toc}
+      full={data.full}
+      footer={{
+        // Render comments below the built-in prev/next recommendations
+        children: <Comments />,
+      }}
+    >
       <DocsTitle>{data.title}</DocsTitle>
       <DocsDescription className="!mb-2 text-base">{data.description}</DocsDescription>
       {data.authors && data.authors.length > 0 && (

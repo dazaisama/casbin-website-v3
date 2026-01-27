@@ -6,6 +6,7 @@ import { AuthorCard } from "@/components/blog/AuthorCard";
 import { BlogPostActions } from "@/components/blog/BlogPostActions";
 import { InlineTOC } from "@/components/inline-toc";
 import type { TOCItemType } from "fumadocs-core/toc";
+import Comments from '@/components/Comments';
 import { calculateReadingTime } from "@/lib/utils";
 
 interface BlogPageData {
@@ -58,6 +59,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string[
           </div>
         )}
         <MDX components={getMDXComponents()} />
+        <Comments />
       </DocsBody>
     </DocsPage>
   );
