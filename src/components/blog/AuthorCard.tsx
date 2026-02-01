@@ -6,6 +6,7 @@ interface AuthorCardProps {
   author?: string;
   authorURL?: string;
   authorImageURL?: string;
+  authors?: string[];
   date?: string;
   readTime?: string;
   className?: string;
@@ -37,10 +38,93 @@ export function AuthorCard({
   author,
   authorURL,
   authorImageURL,
+  authors,
   date,
   readTime,
   className,
 }: AuthorCardProps) {
+  // Handle multiple authors case
+  if (authors && authors.length > 0) {
+    const formattedDate = date
+      ? new Date(date).toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        })
+      : null;
+
+    return (
+      <div
+        className={cn("flex flex-wrap items-center gap-2 text-sm text-muted-foreground", className)}
+      >
+        {authors.flatMap((authorName, index) => {
+          const githubUrl = `https://github.com/${encodeURIComponent(authorName)}`;
+          const avatarUrl = !authorName.includes(" ")
+            ? `https://github.com/${encodeURIComponent(authorName)}.png`
+            : null;
+
+          const elements = [];
+
+          if (avatarUrl) {
+            elements.push(
+              <div className="relative shrink-0" key={`${authorName}-${index}-avatar`}>
+                <Link
+                  href={githubUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block leading-none"
+                >
+                  <Avatar className="h-6 w-6 border border-border/50">
+                    <AvatarImage src={avatarUrl} alt={authorName} className="object-cover" />
+                    <AvatarFallback>{authorName.charAt(0).toUpperCase()}</AvatarFallback>
+                  </Avatar>
+                </Link>
+              </div>,
+            );
+          }
+
+          elements.push(
+            <div className="font-semibold text-foreground" key={`${authorName}-${index}-name`}>
+              <Link
+                href={githubUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:underline"
+              >
+                {authorName}
+              </Link>
+            </div>,
+          );
+
+          if (index < authors.length - 1) {
+            elements.push(
+              <span aria-hidden="true" key={`${authorName}-${index}-comma`}>
+                ,
+              </span>,
+            );
+          }
+
+          return elements;
+        })}
+
+        {readTime && (
+          <>
+            <span aria-hidden="true">·</span>
+            <span>{readTime} read</span>
+          </>
+        )}
+
+        {formattedDate && (
+          <>
+            <span aria-hidden="true">·</span>
+            <time dateTime={date}>{formattedDate}</time>
+          </>
+        )}
+      </div>
+    );
+  }
+
+  // Handle single author case (backward compatibility)
   if (!author && !date) return null;
 
   const githubUrl = sanitizeAuthorUrl(authorURL);
